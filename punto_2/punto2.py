@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
 
-img=np.asarray(mpimg.imread("forest.png"))
+img=np.asarray(mpimg.imread("imagen.png"))  ##Guarda filtro alto y bajo para imagen.png
 print img.shape
 
 
@@ -58,17 +58,35 @@ def norm(arr):
         arr[:,:,i]=((arr[:,:,i]-minim)/(maxim-minim))
     return arr
 
-fim = f2d(img)
-res = finv2d(fim)
-mpimg.imsave("suave.png", norm(res))
+def alto(arr):
+    s=np.shape(arr)
+    arr=arr.real
+    for i in range(s[2]):
+        maxim=np.max(arr[:,:,i])
+        minim=np.min(arr[:,:,i])
+        arr[:,:,i]=((arr[:,:,i]-minim)/(maxim-minim))
+    return arr
 
-for i in range(3):
-    ceros=np.zeros(np.shape(res))
-    nom="ej"+str(int(i))+".png"
-    ceros[:,:,i]=res[:,:,i].real
-    maxim=np.max(ceros[:,:,i])
-    minim=np.min(ceros[:,:,i])
-    ceros[:,:,i]=((ceros[:,:,i]-minim)/(maxim-minim))
-    mpimg.imsave(nom, ceros)
+def bajo(arr):
+    s=np.shape(arr)
+    arr=arr.real
+    for i in range(s[2]):
+        maxim=np.max(arr[:,:,i])
+        minim=np.min(arr[:,:,i])
+        arr[:,:,i]=((arr[:,:,i]-minim)/(maxim-minim))
+    return arr
+
+
+
+fim = f2d(img)
+
+alto = alto(fim)
+bajo = bajo(fim)
+
+res = finv2d(fim)
+mpimg.imsave("altas.png", norm(alto))
+mpimg.imsave("bajas.png", norm(bajo))
+
+
 
 

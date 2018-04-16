@@ -2,13 +2,17 @@
 #include <fstream>
 #include <math.h>
 #include <ctime>
+#include <complex>
+
+
 
 using namespace std;
+typedef complex<double> dcmplx;
 
-
-int main () {
+int main (nt argc, char *argv[]) {
+    const double PI = 3.14159265359;
     ifstream infile;
-    infile.open("archivo.txt");
+    infile.open(argv[1]);
     double ti, xi;
     double tmin=ti;
     double xmin;
@@ -68,6 +72,36 @@ int main () {
         }
     xf[g]=prov;
     }
+
+
+// tf y xf son los pares de tiempo espaciados. Dimension : n pares
+
+    dcmplx dft[n];
+    dcmplx img(0,1);
+    dcmplx ze;
+    ze = exp(-2*PI*img/n);
+    
+    for(int g1=0; g1<n;g1++){
+        
+        for(int g2=1; g2<n;g2++){
+            dft[g1]+=(xf[g2]*(ze**(g1*g2)));
+        }
+    }
+    
+   double omega[n];
+    for(int ifi1=0; ifi1<n;ifi1++){        
+        omega[ifin]=(2*PI*ifi1)/(tmax-tmin);
+    }   
+   ofstream outfile;
+   outfile.open("transformada.txt");
+    for(int ifi=0; ifi<n;ifi++){        
+        outfile << omega[ifi] <<" "<< dft[ifi].real <<" "<< dft[ifi].imag  << endl;
+    }
+   
+
+
+   outfile.close();
+
 
     return 0;
 }
