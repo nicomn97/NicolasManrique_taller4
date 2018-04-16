@@ -10,8 +10,8 @@ print img.shape
 def f2d(mat):
     tam=np.shape(mat)
     tran=np.zeros(tam,dtype=complex)
-    N=tam[0]
-    M=tam[1]
+    N=tam[0]-1
+    M=tam[1]-1
     for k in range(tam[2]):
         z=np.exp(-2.0j*np.pi*mat[:,:,k])
         for l in range(N):
@@ -20,9 +20,10 @@ def f2d(mat):
                 for i in range(N):
                     zj=np.zeros(M,dtype=complex)
                     for j in range(M):
-                        zj[j]=z[i,j]**((((1.0+(i*l)))/N)+(((1.0+(j*m)/M))))*mat[i,j,k]
+                        zj[j]=(z[i,j]**((((i+1*l)/N)+((j+1*m)/M))))*mat[i,j,k]
                     zi[i]=np.sum(zj)
-                tran[l,m,k]=np.sum(zi)
+                tran[l,m,k]=np.sum(np.nan_to_num(zi))
+        print 1*k
     for s in range(tam[2]):
         tran[:,:,s]=(1.0/(2.0*np.pi)*tran[:,:,s])
     return tran
@@ -30,8 +31,8 @@ def f2d(mat):
 def finv2d(mat):
     tam=np.shape(mat)
     tran=np.zeros(tam,dtype=complex)
-    N=tam[0]
-    M=tam[1]
+    N=tam[0]-1
+    M=tam[1]-1
     for k in range(tam[2]):
         z=np.exp(-2.0j*np.pi*mat[:,:,k])
         for l in range(N):
@@ -40,19 +41,34 @@ def finv2d(mat):
                 for i in range(N):
                     zj=np.zeros(M,dtype=complex)
                     for j in range(M):
-                        zj[j]=z[i,j]**(((-(1.0+(i*l)))/N)-(((1.0+(j*m)/M))))*mat[i,j,k]
-                    zi[i]=np.sum(zj)
+                        zj[j]=(z[i,j]**((-((i+1*l)/N)-((j+1*m)/M))))*mat[i,j,k]
+                    zi[i]=np.sum(np.nan_to_num(zj))
                 tran[l,m,k]=np.sum(zi)
+        print 7*k
     for s in range(tam[2]):
-        tran[:,:,s]=((2.0*np.pi/(N*M))*tran[:,:,s])
+        tran[:,:,s]=(((2.0*np.pi/(N*M))*tran[:,:,s]))
     return tran
 
+def norm(arr):
+    s=np.shape(arr)
+    arr=arr.real
+    for i in range(s[2]):
+        maxim=np.max(arr[:,:,i])
+        minim=np.min(arr[:,:,i])
+        arr[:,:,i]=((arr[:,:,i]-minim)/(maxim-minim))
+    return arr
 
 fim = f2d(img)
-res = np.real(finv2d(fim))
-print res
+res = finv2d(fim)
+mpimg.imsave("suave.png", norm(res))
 
-
-mpimg.imsave("suave.png", res)
+for i in range(3):
+    ceros=np.zeros(np.shape(res))
+    nom="ej"+str(int(i))+".png"
+    ceros[:,:,i]=res[:,:,i].real
+    maxim=np.max(ceros[:,:,i])
+    minim=np.min(ceros[:,:,i])
+    ceros[:,:,i]=((ceros[:,:,i]-minim)/(maxim-minim))
+    mpimg.imsave(nom, ceros)
 
 
